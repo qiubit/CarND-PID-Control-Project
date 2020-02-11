@@ -2,6 +2,7 @@
 #include <uWS/uWS.h>
 #include <iostream>
 #include <string>
+#include <algorithm>
 #include "json.hpp"
 #include "PID.h"
 
@@ -34,9 +35,7 @@ int main() {
   uWS::Hub h;
 
   PID pid;
-  /**
-   * TODO: Initialize the pid variable.
-   */
+  pid.init(0.1, 0.03, 0.01);
 
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
                      uWS::OpCode opCode) {
@@ -57,12 +56,12 @@ int main() {
           double speed = std::stod(j[1]["speed"].get<string>());
           double angle = std::stod(j[1]["steering_angle"].get<string>());
           double steer_value;
-          /**
-           * TODO: Calculate steering value here, remember the steering value is
-           *   [-1, 1].
-           * NOTE: Feel free to play around with the throttle and speed.
-           *   Maybe use another PID controller to control the speed!
-           */
+
+          pid.UpdateError(cte);
+          double pid_error = pid.TotalError();
+          steer_value = -pid_error*steer_value;
+          // clamp to [-1, 1]
+          steer_value = std::min(std::max(-1.0, steer_value), 1.0);
           
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value 
