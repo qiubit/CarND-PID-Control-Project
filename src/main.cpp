@@ -35,7 +35,7 @@ int main() {
   uWS::Hub h;
 
   PID pid;
-  pid.Init(0.5, 0.0001, 0.1);
+  pid.Init(0.20, 0.0, 0.55);
 
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
                      uWS::OpCode opCode) {
@@ -67,11 +67,11 @@ int main() {
           
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value 
-                    << "speed: " << speed << std::endl;
+                    << std::endl;
 
           json msgJson;
           msgJson["steering_angle"] = steer_value;
-          msgJson["throttle"] = speed > 15.0 ? 0.0 : 0.3;
+          msgJson["throttle"] = speed > 25.0 ? 0.0 : 0.3;
 
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
